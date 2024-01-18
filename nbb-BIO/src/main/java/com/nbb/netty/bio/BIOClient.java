@@ -1,4 +1,6 @@
-package com.nbb.bio;
+package com.nbb.netty.bio;
+
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +15,7 @@ import java.util.concurrent.Executors;
  * @author 胡鹏
  * @date 2020/08/28
  */
+@Slf4j
 public class BIOClient {
 
     public static void main(String[] args) throws IOException, InterruptedException {
@@ -33,15 +36,16 @@ public class BIOClient {
             while (true) {
                 int read = inputStream.read(bytes);
                 if (read == -1) {
-                    System.out.println("====读取到到达流结尾，数据读完了====");
+                    log.info("====读取到到达流结尾，数据读完了====");
                     break; // 读取到达流的末尾
                 }
-                System.out.println("====读取到server端发送的信息：" + new String(bytes, 0, read) + "====");
+                log.info("====读取到server端发送的信息：{}====", new String(bytes, 0, read));
             }
 
 //            inputStream.close();
         } catch (Exception e) {
-            System.out.println("====bio-client读数据出错，错误信息是：" + e.getMessage() + "====");
+            log.info("====读数据出错了====");
+            log.error(e.getMessage(), e);
         }
     }
 
@@ -49,12 +53,13 @@ public class BIOClient {
         try {
             OutputStream outputStream = socket.getOutputStream();
             while (true) {
-                System.out.println("我也正在写数据");
+                log.info("====我也正在写数据====");
                 outputStream.write(("bio-client-" + System.currentTimeMillis()).getBytes());
                 Thread.sleep(1000L);
             }
         } catch (Exception e) {
-            System.out.println("====bio-client写数据出错，错误信息是：" + e.getMessage() + "====");
+            log.info("====写数据出错了====");
+            log.error(e.getMessage(), e);
         }
     }
 
