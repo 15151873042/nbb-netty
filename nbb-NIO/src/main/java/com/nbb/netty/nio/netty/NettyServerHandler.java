@@ -25,7 +25,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         Channel channel = ctx.channel();
         ByteBuf buf = (ByteBuf) msg; // 将msg转成ByteBuf
-        log.info("====接收到客户端【{}】发送的消息【{}】====", channel.remoteAddress(), buf.toString(StandardCharsets.UTF_8));
+        log.info("====接收到客户端【{}】发送的消息【{}】，当前通道id为【{}】====", channel.remoteAddress(), buf.toString(StandardCharsets.UTF_8), channel.id());
     }
 
     /**
@@ -37,12 +37,14 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         // writeAndFlush 是 write + flush
         // 将数据写入到缓存，并刷新
-        ctx.writeAndFlush(Unpooled.copiedBuffer("hello, 客户端~(>^ω^<)喵1", StandardCharsets.UTF_8));
+        ctx.writeAndFlush(Unpooled.copiedBuffer("hello, client", StandardCharsets.UTF_8));
     }
 
     // 异常处理，一般需要关闭通道
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        log.error("====出错了====");
+        log.error(cause.getMessage(), cause);
         ctx.close();
     }
 }

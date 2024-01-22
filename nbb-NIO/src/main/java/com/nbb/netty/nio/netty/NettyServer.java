@@ -38,12 +38,12 @@ public class NettyServer {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
                             //可以使用一个list维护SocketChannel， 在推送消息时，可以将业务加入到各个channel 对应的 NIOEventLoop 的 taskQueue 或者 scheduleTaskQueue
-                            log.info("====有新的客户端【{}】连接进来了====", ch.remoteAddress());
+                            log.info("====有新的客户端【{}】连接进来了，当前通道id为【{}】====", ch.remoteAddress(), ch.id());
                             ch.pipeline().addLast(new NettyServerHandler());
                         }
                     }); // 给workerGroup 的 EventLoop 对应的管道设置处理
 
-            log.info("====服务器启动了====");
+            log.info("====netty-server服务启动了====");
 
             // 绑定一个端口并同步，生成一个 ChannelFuture对象
             ChannelFuture cf = bootstrap.bind(6668).sync();
@@ -59,7 +59,7 @@ public class NettyServer {
                 }
             });
 
-            // 对关闭通道进行监听
+            // 对关闭通道进行监听（防止main方法运行结果关闭主线程）
             cf.channel().closeFuture().sync();
         } finally {
             bossGroup.shutdownGracefully();

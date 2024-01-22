@@ -1,4 +1,4 @@
-package com.nbb.netty.nio;
+package com.nbb.netty.nio.server.legacy;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
