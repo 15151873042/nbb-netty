@@ -54,25 +54,25 @@ public class GroupChatServer {
         }
     }
 
-    private void handle(SelectionKey key) {
-        if (key.isAcceptable()) {
-            ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
-            SocketChannel socketChannel = listenChannel.accept();
-            socketChannel.configureBlocking(false);
-            socketChannel.register(selector, SelectionKey.OP_READ);
-        } else if (key.isReadable()) {
-            SocketChannel channel = (SocketChannel) key.channel();
-            ByteBuffer buffer = ByteBuffer.allocate(1024);
-            int readCount = channel.read(buffer);
-            if (readCount != -1) {
-                String clientMsg = new String(buffer.array());
-                log.info("读取到客户端发送的消息：{}", new String(buffer.array()));
-                log.info("准备向客户端转发消息");
-                this.sendMessageToOtherClient(clientMsg, channel);
-
-            }
-        }
-    }
+//    private void handle(SelectionKey key) {
+//        if (key.isAcceptable()) {
+//            ServerSocketChannel serverSocketChannel = (ServerSocketChannel) key.channel();
+//            SocketChannel socketChannel = listenChannel.accept();
+//            socketChannel.configureBlocking(false);
+//            socketChannel.register(selector, SelectionKey.OP_READ);
+//        } else if (key.isReadable()) {
+//            SocketChannel channel = (SocketChannel) key.channel();
+//            ByteBuffer buffer = ByteBuffer.allocate(1024);
+//            int readCount = channel.read(buffer);
+//            if (readCount != -1) {
+//                String clientMsg = new String(buffer.array());
+//                log.info("读取到客户端发送的消息：{}", new String(buffer.array()));
+//                log.info("准备向客户端转发消息");
+//                this.sendMessageToOtherClient(clientMsg, channel);
+//
+//            }
+//        }
+//    }
 
     // 向所有其它client端发送消息
     private void sendMessageToOtherClient(String msg, SocketChannel selfChannel) {
