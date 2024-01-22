@@ -1,4 +1,4 @@
-package com.nbb.netty.nio.netty;
+package com.nbb.netty.netty.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -10,10 +10,11 @@ import lombok.extern.slf4j.Slf4j;
 import java.nio.charset.StandardCharsets;
 
 /**
+ * workerGroup 的 EventLoop 处理请求的handler
  * 自定义一个handler，需要继承netty规定好的某个HandlerAdapter
  */
 @Slf4j
-public class NettyServerHandler extends ChannelInboundHandlerAdapter {
+public class NettyServerWorkerGroupHandler extends ChannelInboundHandlerAdapter {
 
     /**
      * 读取消息
@@ -37,7 +38,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelReadComplete(ChannelHandlerContext ctx) throws Exception {
         // writeAndFlush 是 write + flush
         // 将数据写入到缓存，并刷新
-        ctx.writeAndFlush(Unpooled.copiedBuffer("hello, client", StandardCharsets.UTF_8));
+        ctx.writeAndFlush(Unpooled.copiedBuffer("狗碗！", StandardCharsets.UTF_8));
     }
 
     // 异常处理，一般需要关闭通道

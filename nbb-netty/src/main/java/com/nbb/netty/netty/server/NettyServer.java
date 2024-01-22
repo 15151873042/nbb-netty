@@ -1,4 +1,4 @@
-package com.nbb.netty.nio.netty;
+package com.nbb.netty.netty.server;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
@@ -30,23 +30,15 @@ public class NettyServer {
             ServerBootstrap bootstrap = new ServerBootstrap();
             bootstrap
                     .group(bossGroup, workerGroup) // 设置两个线程组
-                    .channel(NioServerSocketChannel.class) // 使用NioSocketChannel作为服务器的通道实现
-                    .option(ChannelOption.SO_BACKLOG, 128) // 设置线程队列得到连接个数
+                    .channel(NioServerSocketChannel.class) // 使用NioServerSocketChannel作为服务器的通道实现
+                    .option(ChannelOption.SO_BACKLOG, 128) // 设置线程队列等待连接个数
                     .childOption(ChannelOption.SO_KEEPALIVE, true) // 设置保持活动连接状态
-                    .childHandler(new ChannelInitializer<SocketChannel>() { // 创建一个通道初始化对象
+                    .childHandler(new NettyServerBossGroupHandler()); // 给workerGroup 的 EventLoop 对应的管道设置处理器
 
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            //可以使用一个list维护SocketChannel， 在推送消息时，可以将业务加入到各个channel 对应的 NIOEventLoop 的 taskQueue 或者 scheduleTaskQueue
-                            log.info("====有新的客户端【{}】连接进来了，当前通道id为【{}】====", ch.remoteAddress(), ch.id());
-                            ch.pipeline().addLast(new NettyServerHandler());
-                        }
-                    }); // 给workerGroup 的 EventLoop 对应的管道设置处理
-
-            log.info("====netty-server服务启动了====");
 
             // 绑定一个端口并同步，生成一个 ChannelFuture对象
             ChannelFuture cf = bootstrap.bind(6668).sync();
+            log.info("====netty-server服务启动了====");
 
             cf.addListener(new ChannelFutureListener() {
                 @Override

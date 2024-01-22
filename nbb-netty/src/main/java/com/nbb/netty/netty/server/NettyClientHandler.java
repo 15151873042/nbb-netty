@@ -1,4 +1,4 @@
-package com.nbb.netty.nio.netty;
+package com.nbb.netty.netty.server;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -15,7 +15,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
     // 通道就绪时回调该方法
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        ctx.writeAndFlush(Unpooled.copiedBuffer("hello, server", StandardCharsets.UTF_8));
+        ctx.writeAndFlush(Unpooled.copiedBuffer("什么碗？", StandardCharsets.UTF_8));
     }
 
     @Override

@@ -1,17 +1,12 @@
-package com.nbb.netty.nio.netty;
+package com.nbb.netty.netty.server;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class NettyClient {
@@ -20,7 +15,6 @@ public class NettyClient {
 
         // 客户端需要一个事件循环组
         NioEventLoopGroup group = new NioEventLoopGroup();
-
 
         try {
             // 创建客户端启动对象

@@ -5,12 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.nbb.netty</groupId>
-    <artifactId>nbb-netty</artifactId>
+    <artifactId>nbb-netty-all</artifactId>
     <version>1.0</version>
     <packaging>pom</packaging>
     <modules>
         <module>nbb-BIO</module>
         <module>nbb-NIO</module>
+        <module>nbb-netty</module>
     </modules>
 
     <properties>
