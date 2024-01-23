@@ -5,16 +5,18 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.EventLoop;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 
 /**
+ * 从管道中读取数据的handler
  * workerGroup 的 EventLoop 处理请求的handler
  * 自定义一个handler，需要继承netty规定好的某个HandlerAdapter
  */
 @Slf4j
-public class NettyServerWorkerGroupHandler extends ChannelInboundHandlerAdapter {
+public class NettyServerChannelReadHandler extends ChannelInboundHandlerAdapter {
 
     /**
      * 读取消息
@@ -27,6 +29,11 @@ public class NettyServerWorkerGroupHandler extends ChannelInboundHandlerAdapter 
         Channel channel = ctx.channel();
         ByteBuf buf = (ByteBuf) msg; // 将msg转成ByteBuf
         log.info("====接收到客户端【{}】发送的消息【{}】，当前通道id为【{}】====", channel.remoteAddress(), buf.toString(StandardCharsets.UTF_8), channel.id());
+
+        EventLoop eventLoop = ctx.channel().eventLoop();
+        eventLoop.execute(() -> {
+            // TODO 可以将处理事件较长的业务逻辑放入任务队列中处理，当前event事件处理完之后会执行任务队列中的任务
+        });
     }
 
     /**

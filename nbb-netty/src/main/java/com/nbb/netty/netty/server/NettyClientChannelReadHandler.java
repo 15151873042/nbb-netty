@@ -9,8 +9,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 
+/**
+ * 从通道中读取数据的handler
+ */
 @Slf4j
-public class NettyClientHandler extends ChannelInboundHandlerAdapter {
+public class NettyClientChannelReadHandler extends ChannelInboundHandlerAdapter {
 
     // 通道就绪时回调该方法
     @Override

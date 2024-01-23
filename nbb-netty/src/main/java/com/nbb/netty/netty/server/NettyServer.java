@@ -3,10 +3,8 @@ package com.nbb.netty.netty.server;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import lombok.extern.slf4j.Slf4j;
 
@@ -23,7 +21,7 @@ public class NettyServer {
     public static void main(String[] args) throws InterruptedException {
 
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
+        NioEventLoopGroup workerGroup = new NioEventLoopGroup(1);
 
         try {
             // 创建服务器端的启动对象，配置参数
@@ -33,7 +31,7 @@ public class NettyServer {
                     .channel(NioServerSocketChannel.class) // 使用NioServerSocketChannel作为服务器的通道实现
                     .option(ChannelOption.SO_BACKLOG, 128) // 设置线程队列等待连接个数
                     .childOption(ChannelOption.SO_KEEPALIVE, true) // 设置保持活动连接状态
-                    .childHandler(new NettyServerBossGroupHandler()); // 给workerGroup 的 EventLoop 对应的管道设置处理器
+                    .childHandler(new NettyServerChannelInitHandler()); // 给workerGroup 的 EventLoop 对应的管道添加一个处理器
 
 
             // 绑定一个端口并同步，生成一个 ChannelFuture对象
