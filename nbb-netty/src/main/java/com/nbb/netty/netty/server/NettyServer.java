@@ -14,7 +14,7 @@ public class NettyServer {
     /**
      * 创建BossGroup 和 WorkerGroup
      * 1、创建两个线程组 boosGroup 和 workerGroup
-     * 2、bossGroup只是处理连接请求，真正和客户吨啊业务处理，会交给workerGroup完成
+     * 2、bossGroup只是处理连接请求，真正和客户端的业务处理，会交给workerGroup完成
      * 3、两个都是无线循环
      * 4、bossGroup 和 workerGroup 含有子线程(NioEventLoop)的个数
      */
@@ -34,20 +34,22 @@ public class NettyServer {
                     .childHandler(new NettyServerChannelInitHandler()); // 给workerGroup 的 EventLoop 对应的管道添加一个处理器
 
 
-            // 绑定一个端口并同步，生成一个 ChannelFuture对象
+            // 绑定一个端口并同步，生成一个 ChannelFuture对象，sync()表示同步等待处理完成，也可以不调用sync()
             ChannelFuture cf = bootstrap.bind(6668).sync();
             log.info("====netty-server服务启动了====");
 
-            cf.addListener(new ChannelFutureListener() {
-                @Override
-                public void operationComplete(ChannelFuture future) throws Exception {
-                    if (cf.isSuccess()) {
-                        log.info("====监听端口 6668 成功====");
-                    } else {
-                        log.info("====监听端口 6668 失败====");
-                    }
-                }
-            });
+
+            /// addListener表示添加处理结果的回调信息
+//            cf.addListener(new ChannelFutureListener() {
+//                @Override
+//                public void operationComplete(ChannelFuture future) throws Exception {
+//                    if (cf.isSuccess()) {
+//                        log.info("====监听端口 6668 成功====");
+//                    } else {
+//                        log.info("====监听端口 6668 失败====");
+//                    }
+//                }
+//            });
 
             // 对关闭通道进行监听（防止main方法运行结果关闭主线程）
             cf.channel().closeFuture().sync();

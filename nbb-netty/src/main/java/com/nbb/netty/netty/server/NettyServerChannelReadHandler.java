@@ -5,7 +5,6 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.EventLoop;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
@@ -30,10 +29,19 @@ public class NettyServerChannelReadHandler extends ChannelInboundHandlerAdapter 
         ByteBuf buf = (ByteBuf) msg; // 将msg转成ByteBuf
         log.info("====接收到客户端【{}】发送的消息【{}】，当前通道id为【{}】====", channel.remoteAddress(), buf.toString(StandardCharsets.UTF_8), channel.id());
 
-        EventLoop eventLoop = ctx.channel().eventLoop();
-        eventLoop.execute(() -> {
-            // TODO 可以将处理事件较长的业务逻辑放入任务队列中处理，当前event事件处理完之后会执行任务队列中的任务
-        });
+        /// 可以直接向通道中写数据
+//        channel.write(Unpooled.copiedBuffer("小狗碗！", StandardCharsets.UTF_8));
+
+        /// 使用异步任务
+//        EventLoop eventLoop = channel.eventLoop();
+//        eventLoop.execute(() -> {
+//            log.info("====eventLoop.execute()===="); // TODO 可以将处理事件较长的业务逻辑放入任务队列中处理，当前event事件处理完之后会执行任务队列中的任务
+//        });
+
+        /// 使用异步定时任务
+//        eventLoop.schedule(() -> {
+//            log.info("====eventLoop.schedule()===="); // FIXME 定时任务是如何执行的，是在所有任务处理完成之后，select.select(时间)时，入参传入下一个定时任务将要发生的时间，当时间到了之后，select.select(时间)的返回值为0，这时从定时任务队列取出任务后再放入任务队列，将其当作普通任务处理
+//        }, 10, TimeUnit.SECONDS);
     }
 
     /**
