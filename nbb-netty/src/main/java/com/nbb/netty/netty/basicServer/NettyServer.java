@@ -1,8 +1,7 @@
-package com.nbb.netty.netty.server;
+package com.nbb.netty.netty.basicServer;
 
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -21,7 +20,7 @@ public class NettyServer {
     public static void main(String[] args) throws InterruptedException {
 
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(1);
-        NioEventLoopGroup workerGroup = new NioEventLoopGroup(1);
+        NioEventLoopGroup workerGroup = new NioEventLoopGroup();
 
         try {
             // 创建服务器端的启动对象，配置参数

@@ -1,4 +1,4 @@
-package com.nbb.netty.netty.server;
+package com.nbb.netty.netty.basicServer;
 
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.SocketChannel;
