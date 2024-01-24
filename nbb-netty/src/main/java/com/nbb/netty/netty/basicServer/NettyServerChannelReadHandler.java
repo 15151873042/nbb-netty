@@ -59,8 +59,8 @@ public class NettyServerChannelReadHandler extends ChannelInboundHandlerAdapter 
     // 异常处理，一般需要关闭通道
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.error("====出错了====");
+        log.error("====出错了===="); // 客户端断开时，会进入此方法
         log.error(cause.getMessage(), cause);
-        ctx.close();
+        ctx.close(); // 关闭channel通道
     }
 }

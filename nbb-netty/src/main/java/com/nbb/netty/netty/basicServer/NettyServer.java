@@ -33,7 +33,7 @@ public class NettyServer {
                     .childHandler(new NettyServerChannelInitHandler()); // 给workerGroup 的 EventLoop 对应的管道添加一个处理器
 
 
-            // 绑定一个端口并同步，生成一个 ChannelFuture对象，sync()表示同步等待处理完成，也可以不调用sync()
+            // 绑定一个端口并同步，生成一个 ChannelFuture对象，sync()表示等待异步操作执行完毕，也可以不调用sync()
             ChannelFuture cf = bootstrap.bind(6668).sync();
             log.info("====netty-server服务启动了====");
 
