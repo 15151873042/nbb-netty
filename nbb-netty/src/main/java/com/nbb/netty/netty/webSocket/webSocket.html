@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>webSocket-demo</title>
+</head>
+<body>
+    <script>
+        var socket;
+        if (!window.WebSocket) {
+            alert("当前浏览器不支持websocket");
+            throw Error(); // js非function方法中想要提前结束，return;没有用
+        }
+
+        socket = new WebSocket("ws://localhost:7000/test");
+
+        // 客户端接收服务端数据时触发
+        socket.onmessage = function(event) {
+            var rt = document.getElementById("responseText");
+            rt.value = rt.value + "\n" + event.data;
+        }
+
+        // 连接建立时触发
+        socket.onopen = function(event) {
+            var rt = document.getElementById("responseText");
+            rt.value = "WebSocket连接已建立....."
+        }
+
+        // 连接关闭时触发
+        socket.onclose = function(event) {
+            var rt = document.getElementById("responseText");
+            rt.value = rt.value + "\n" + "WebSocket连接已关闭...."
+        }
+
+
+
+        function closeConnect() {
+            socket.close()
+        }
+
+        // 发送消息到服务器
+        function send(message) {
+            if (socket && socket.readyState == WebSocket.OPEN) {
+                socket.send(message)
+            } else {
+                alert("webSocket连接还没建立")
+            }
+        }
+
+    </script>
+
+    <form onsubmit="return false">
+        <textarea name="message" style="height: 300px; width: 300px"></textarea>
+        <input type="button" value="发送消息" onclick="send(this.form.message.value)">
+        <textarea id="responseText" style="height: 300px; width: 300px"></textarea>
+        <input type="button" value="清空内容" onclick="document.getElementById('responseText').value=''">
+        <br/>
+        <input type="button" value="关闭连接" onclick="closeConnect()">
+    </form>
+</body>
+</html>
