@@ -1,0 +1,6 @@
+server:
+  port: 8080
+
+netty:
+  port: 7070
+  boos-thread: 1

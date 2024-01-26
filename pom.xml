@@ -12,6 +12,7 @@
         <module>nbb-BIO</module>
         <module>nbb-NIO</module>
         <module>nbb-netty</module>
+        <module>nbb-springboot-netty</module>
     </modules>
 
     <properties>
