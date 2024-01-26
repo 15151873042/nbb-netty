@@ -16,6 +16,7 @@
         <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>2.7.6</spring-boot.version>
+        <netty.version>4.1.106.Final</netty.version>
     </properties>
 
     <dependencies>
@@ -27,8 +28,14 @@
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
-            <version>4.1.106.Final</version>
         </dependency>
+
+        <!-- netty示例教程包 -->
+        <dependency>
+            <groupId>io.netty</groupId>
+            <artifactId>netty-example</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -42,6 +49,13 @@
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>io.netty</groupId>
+                <artifactId>netty-bom</artifactId>
+                <version>${netty.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
