@@ -38,7 +38,7 @@ public class NettyServer {
         NioEventLoopGroup bossGroup = new NioEventLoopGroup(nettyProperties.getBoosThread());
         NioEventLoopGroup workerGroup = new NioEventLoopGroup(nettyProperties.getWorkerThread());
 
-        try {
+//        try {
             ServerBootstrap serverBootstrap = new ServerBootstrap();
             serverBootstrap.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
@@ -59,10 +59,10 @@ public class NettyServer {
 
             log.info("Netty-server在{}端口启动成功", nettyProperties.getPort());
 
-        } finally {
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
+//        } finally {
+//            bossGroup.shutdownGracefully();
+//            workerGroup.shutdownGracefully();
+//        }
     }
 
 
