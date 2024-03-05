@@ -9,6 +9,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.util.concurrent.Future;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.SmartLifecycle;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -16,54 +17,113 @@ import java.util.concurrent.locks.LockSupport;
 
 @Slf4j
 @Component
-public class NettyServer {
+public class NettyServer implements SmartLifecycle {
 
 
     @Autowired
     private NettyProperties nettyProperties;
 
-    /** netty-server启动端口绑定成功的标识 */
-    private AtomicBoolean nettyPortBind = new AtomicBoolean(false);
+    /** netty-server是否正在运行的标识 */
+    private AtomicBoolean nettyRunning = new AtomicBoolean(false);
 
-    /** 当前springBoot项目启动主线程 */
-    private Thread springBootStartThread;
+    /** netty-server启动端口是否绑定成功的标识 */
+    private AtomicBoolean portBindSuccess = new AtomicBoolean(false);
 
+    /** netty-server启动主线程 */
+    private Thread nettyStartMainThread;
+
+    private NioEventLoopGroup bossGroup;
+
+    private NioEventLoopGroup workerGroup;
+
+
+    @Override
+    public void start() {
+        boolean success = this.startServer();
+        if (!success) {
+            throw new RuntimeException("Netty-server启动失败");
+        }
+    }
+
+    @Override
+    public void stop() {
+        boolean success = this.stopServer();
+        if (!success) {
+            throw new RuntimeException("Netty-server关闭失败");
+        }
+    }
+
+    @Override
+    public boolean isRunning() {
+        return nettyRunning.get();
+    }
 
     /**
      * 启动netty服务器
      */
-    public void start() {
-        this.springBootStartThread = Thread.currentThread();
+    public boolean startServer() {
+        if (!nettyRunning.compareAndSet(false, true)) {
+            log.info("netty-server已启动");
+            return false;
+        }
 
-        NioEventLoopGroup bossGroup = new NioEventLoopGroup(nettyProperties.getBoosThread());
-        NioEventLoopGroup workerGroup = new NioEventLoopGroup(nettyProperties.getWorkerThread());
+        this.nettyStartMainThread = Thread.currentThread();
 
-//        try {
-            ServerBootstrap serverBootstrap = new ServerBootstrap();
-            serverBootstrap.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .childHandler(new NettyServerChannelInitializer());
+        bossGroup = new NioEventLoopGroup(nettyProperties.getBoosThread());
+        workerGroup = new NioEventLoopGroup(nettyProperties.getWorkerThread());
 
-            // netty-server启动绑定对应端口
-            ChannelFuture portBindFuture = serverBootstrap.bind(nettyProperties.getPort());
-            // 添加netty-server端口绑定任务处理完成后的回调
-            portBindFuture.addListener(this::portBindComplete);
+        ServerBootstrap serverBootstrap = new ServerBootstrap();
+        serverBootstrap.group(bossGroup, workerGroup)
+                .channel(NioServerSocketChannel.class)
+                .childHandler(new NettyServerChannelInitializer());
 
-            // 主线程等待netty-server端口绑定任务处理结果
-            LockSupport.park();
+        // netty-server启动绑定对应端口
+        ChannelFuture portBindFuture = serverBootstrap.bind(nettyProperties.getPort());
+        // 添加netty-server端口绑定任务处理完成后的回调
+        portBindFuture.addListener(this::portBindComplete);
 
-            if (Boolean.FALSE.equals(nettyPortBind.get())) {
-                log.error("Netty-server在{}端口启动失败", nettyProperties.getPort());
-                throw new RuntimeException("Netty-server启动失败");
-            }
+        // 主线程等待netty-server端口绑定任务处理结果
+        LockSupport.park();
 
-            log.info("Netty-server在{}端口启动成功", nettyProperties.getPort());
+        if (Boolean.FALSE.equals(portBindSuccess.get())) {
+            nettyRunning.set(false);
+            log.error("Netty-server在{}端口启动失败", nettyProperties.getPort());
+            return false;
+        }
 
-//        } finally {
-//            bossGroup.shutdownGracefully();
-//            workerGroup.shutdownGracefully();
-//        }
+        log.info("Netty-server在{}端口启动成功", nettyProperties.getPort());
+        return true;
     }
+
+    public boolean stopServer() {
+        if (!nettyRunning.compareAndSet(true, false)) {
+            log.info("netty-server已关闭");
+            return false;
+        }
+
+        try {
+            Future<?> boosGroupFuture = bossGroup.shutdownGracefully().sync();
+            Future<?> workerGroupFuture = workerGroup.shutdownGracefully().sync();
+            boolean bossSuccess = boosGroupFuture.isSuccess();
+            boolean workerSuccess = workerGroupFuture.isSuccess();
+            if (bossSuccess && workerSuccess) {
+                bossGroup = null;
+                workerGroup = null;
+                portBindSuccess.set(false);
+                log.info("Netty-server已关闭");
+                return true;
+            }
+            throw new RuntimeException("netty-server关闭失败");
+        } catch (Exception e) {
+            this.nettyRunning.set(true);
+            log.error(e.getMessage(), e);
+            return false;
+        }
+    }
+
+
+
+
 
 
     /**
@@ -72,11 +132,11 @@ public class NettyServer {
      */
     private void portBindComplete(Future future) {
         boolean portBindSuccess = future.isSuccess();
-        nettyPortBind.set(portBindSuccess);
+        this.portBindSuccess.set(portBindSuccess);
 
-        LockSupport.unpark(springBootStartThread);
+        LockSupport.unpark(nettyStartMainThread);
 
-        springBootStartThread = null;
+        nettyStartMainThread = null;
     }
 
     private static class NettyServerChannelInitializer extends ChannelInitializer<NioSocketChannel> {
